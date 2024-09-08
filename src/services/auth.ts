@@ -1,37 +1,32 @@
 import server from './server';
 
-// Login API
-export const login = async (email: string, password: string) => {
+export const registerUser = async (userData: {
+  username: string;
+  name: string;
+  password: string;
+}) => {
   try {
-    const { data } = await server.post('/auth/login', { email, password });
+    const { data } = await server.post('/auth/register', userData);
     return data;
   } catch (error: any) {
-    if (error instanceof Error) {
-      return error.message;
-    } else {
-      return 'An unknown error occurred';
-    }
+    return {
+      message:
+        error instanceof Error ? error.message : 'An unknown error occurred',
+    };
   }
 };
 
-// Register API
-export const register = async (
-  email: string,
-  password: string,
-  name: string
-) => {
+export const loginUser = async (credentials: {
+  username: string;
+  password: string;
+}) => {
   try {
-    const { data } = await server.post('/auth/register', {
-      email,
-      password,
-      name,
-    });
+    const { data } = await server.post('/auth/login', credentials);
     return data;
   } catch (error: any) {
-    if (error instanceof Error) {
-      return error.message;
-    } else {
-      return 'An unknown error occurred';
-    }
+    return {
+      message:
+        error instanceof Error ? error.message : 'Invalid username or password',
+    };
   }
 };
