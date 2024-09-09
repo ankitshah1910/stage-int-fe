@@ -3,14 +3,7 @@
 import { ReactNode } from 'react';
 import './globals.css';
 import { CssBaseline } from '@mui/material';
-import {
-  Container,
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  Box,
-} from '@mui/material';
+import { Container, AppBar, Toolbar, Typography, Box } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { AuthProvider } from '@/context/authContext';
 import AuthButtons from '@/components/AuthButtons';

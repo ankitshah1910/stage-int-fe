@@ -23,7 +23,6 @@ const HomePage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [totalPages, setTotalPages] = useState<number>(0);
   const [hasMore, setHasMore] = useState(true);
   const [activeTab, setActiveTab] = useState<'movies' | 'tvShows'>('movies');
 
@@ -42,12 +41,17 @@ const HomePage: React.FC = () => {
 
       if (activeTab === 'movies') {
         mediaData = await getMovies(page);
-        setMovies((prevMovies) => [...prevMovies, ...mediaData.data]);
-        setTotalPages(mediaData.totalPages);
+
+        setMovies((prevMovies) => [
+          ...prevMovies,
+          ...(mediaData.data as Movie[]),
+        ]);
       } else {
         mediaData = await getTVShows(page);
-        setTVShows((prevTVShows) => [...prevTVShows, ...mediaData.data]);
-        setTotalPages(mediaData.totalPages);
+        setTVShows((prevTVShows) => [
+          ...prevTVShows,
+          ...(mediaData.data as TVShow[]),
+        ]);
       }
 
       setHasMore(page < mediaData.totalPages);
@@ -58,13 +62,13 @@ const HomePage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [activeTab, page, totalPages]);
+  }, [activeTab, page, hasMore]);
 
   useEffect(() => {
     fetchMediaData();
   }, [fetchMediaData]);
 
-  const handleScroll = () => {
+  const handleScroll = useCallback(() => {
     if (
       window.innerHeight + document.documentElement.scrollTop + 1 >=
         document.documentElement.scrollHeight &&
@@ -73,14 +77,14 @@ const HomePage: React.FC = () => {
     ) {
       setPage((prevPage) => prevPage + 1);
     }
-  };
+  }, [hasMore, loading]);
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [hasMore, loading]);
+  }, [hasMore, loading, handleScroll]);
 
   const handleTabChange = (
     event: React.SyntheticEvent,
@@ -97,13 +101,13 @@ const HomePage: React.FC = () => {
   const toggleFavorite = async (mediaId: string, isMovie: boolean) => {
     try {
       if (likedList.includes(mediaId)) {
-        let response = await removeFromLikedList(mediaId);
+        const response = await removeFromLikedList(mediaId);
         if (response.success) {
-          let newArray = likedList.filter((item) => item !== mediaId);
+          const newArray = likedList.filter((item) => item !== mediaId);
           setLikedListItem(newArray);
         }
       } else {
-        let response = await addToLikedList(
+        const response = await addToLikedList(
           mediaId,
           isMovie ? 'movie' : 'tvshow'
         );

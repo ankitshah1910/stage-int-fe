@@ -6,11 +6,10 @@ import { getMyLikedList, removeFromLikedList } from '@/services/me';
 import { useAuth } from '@/context/authContext';
 
 const MyListPage: React.FC = () => {
-  const [likedItems, setLikedItems] = useState([]);
+  const [likedItems, setLikedItems] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState<number>(0);
   const [hasMore, setHasMore] = useState(true);
   const { likedList, setLikedListItem } = useAuth();
 
@@ -21,20 +20,19 @@ const MyListPage: React.FC = () => {
     try {
       const data = await getMyLikedList(page);
       setLikedItems((prevItems: any) => [...prevItems, ...data.data]);
-      setTotalPages(data.totalPages);
       setHasMore(page < data.totalPages);
     } catch (error) {
       setError('Failed to load your list.');
     } finally {
       setLoading(false);
     }
-  }, [page, hasMore, totalPages]);
+  }, [page, hasMore]);
 
   useEffect(() => {
     fetchLikedItems();
   }, [fetchLikedItems]);
 
-  const handleScroll = () => {
+  const handleScroll = useCallback(() => {
     if (
       window.innerHeight + document.documentElement.scrollTop + 1 >=
         document.documentElement.scrollHeight &&
@@ -43,14 +41,14 @@ const MyListPage: React.FC = () => {
     ) {
       setPage((prevPage) => prevPage + 1);
     }
-  };
+  }, [hasMore, loading]);
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [hasMore, loading]);
+  }, [hasMore, loading, handleScroll]);
 
   const handleRemoveFromList = async (mediaId: string) => {
     try {
@@ -58,11 +56,11 @@ const MyListPage: React.FC = () => {
       if (response.success) {
         console.log('prevItems', likedItems);
         console.log(mediaId);
-        let newLikedItems = likedItems.filter(
+        const newLikedItems = likedItems.filter(
           (item: any) => item._id !== mediaId
         );
         setLikedItems(newLikedItems);
-        let newArray = likedList.filter((item) => item !== mediaId);
+        const newArray = likedList.filter((item) => item !== mediaId);
         setLikedListItem(newArray);
       }
     } catch (error) {
@@ -85,7 +83,7 @@ const MyListPage: React.FC = () => {
       )}
 
       <Grid container spacing={2}>
-        {likedItems.map((item: any, index) => (
+        {likedItems.map((item: any, index: number) => (
           <Grid item xs={12} sm={6} md={4} key={item._id + index}>
             <MediaCard
               media={item}

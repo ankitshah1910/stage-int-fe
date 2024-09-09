@@ -1,6 +1,4 @@
-'use client';
-
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
 interface AuthContextType {
@@ -17,13 +15,29 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
-    localStorage.getItem('token') ? true : false
-  );
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [userName, setUserName] = useState<string | null>(null);
-  const [likedList, setLikedList] = useState<string[]>(
-    JSON.parse(localStorage.getItem('likedList') || '[]')
-  );
+  const [likedList, setLikedList] = useState<string[]>([]);
+
+  // Use useEffect to access localStorage only on client-side
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const likedListFromStorage = JSON.parse(
+      localStorage.getItem('likedList') || '[]'
+    );
+
+    setIsAuthenticated(!!token);
+    setLikedList(likedListFromStorage);
+
+    if (token) {
+      try {
+        const decoded: { name: string } = jwtDecode(token);
+        setUserName(decoded.name);
+      } catch (error) {
+        console.error('Token decoding failed:', error);
+      }
+    }
+  }, []);
 
   const login = (token: string, myList: string[]) => {
     localStorage.setItem('token', token);
