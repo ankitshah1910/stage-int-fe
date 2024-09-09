@@ -222,7 +222,7 @@ const HomePage: React.FC = () => {
 
         <Grid container spacing={2} sx={{ mt: 2 }}>
           {activeTab === 'movies' &&
-            movies.slice(10).map((movie, index) => (
+            movies.map((movie, index) => (
               <Grid item xs={12} sm={6} md={4} key={movie._id + index}>
                 <MediaCard
                   media={movie}
@@ -232,7 +232,7 @@ const HomePage: React.FC = () => {
               </Grid>
             ))}
           {activeTab === 'tvShows' &&
-            tvShows.slice(10).map((tvShow, index) => (
+            tvShows.map((tvShow, index) => (
               <Grid item xs={12} sm={6} md={4} key={tvShow._id + index}>
                 <MediaCard
                   media={tvShow}
