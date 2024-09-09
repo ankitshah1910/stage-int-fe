@@ -15,8 +15,8 @@ const RegisterPage = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     const response = await registerUser({ username, name, password });
-
-    if (response.message) {
+    console.log(response);
+    if (response.success) {
       router.push('/login');
     } else {
       setError(response.message || 'Registration failed');

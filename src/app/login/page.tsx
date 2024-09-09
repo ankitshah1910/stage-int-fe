@@ -17,8 +17,8 @@ const LoginPage = () => {
     e.preventDefault();
     const response = await loginUser({ username, password });
 
-    if (response.token) {
-      login(response.token, response.myList);
+    if (response.success) {
+      login(response.data.token, response.data.myList);
       router.push('/');
     } else {
       setError(response.message || 'Login failed');

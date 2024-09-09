@@ -1,5 +1,5 @@
 import server from './server';
-
+import { AxiosError } from 'axios';
 export const registerUser = async (userData: {
   username: string;
   name: string;
@@ -7,11 +7,14 @@ export const registerUser = async (userData: {
 }) => {
   try {
     const { data } = await server.post('/auth/register', userData);
-    return data;
+    return { data, success: true };
   } catch (error: any) {
     return {
+      success: false,
       message:
-        error instanceof Error ? error.message : 'An unknown error occurred',
+        error instanceof AxiosError
+          ? error.response?.data.message
+          : 'An unknown error occurred',
     };
   }
 };
@@ -22,11 +25,14 @@ export const loginUser = async (credentials: {
 }) => {
   try {
     const { data } = await server.post('/auth/login', credentials);
-    return data;
+    return { data, success: true };
   } catch (error: any) {
     return {
+      success: false,
       message:
-        error instanceof Error ? error.message : 'Invalid username or password',
+        error instanceof AxiosError
+          ? error.response?.data.message
+          : 'Invalid username or password',
     };
   }
 };
